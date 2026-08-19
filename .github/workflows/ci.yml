@@ -30,14 +30,15 @@ jobs:
 
       - name: Install Playwright Chromium
         working-directory: backend
-        run: python -m playwright install --with-deps chromium
+        run: |
+          python -m playwright install --with-deps chromium
 
       - name: Prepare clean CI database
         working-directory: backend
         run: |
           rm -f data/*.db data/*.db-shm data/*.db-wal
 
-            - name: Start FastAPI servers
+      - name: Start FastAPI servers
         working-directory: backend
         run: |
           nohup python -m uvicorn main:app --host 127.0.0.1 --port 8000 > /tmp/backend8000.log 2>&1 &
@@ -64,13 +65,16 @@ jobs:
           done
 
           echo "Backend failed to start"
+          echo "===== Port 8000 log ====="
           cat /tmp/backend8000.log || true
+          echo "===== Port 8001 log ====="
           cat /tmp/backend8001.log || true
           exit 1
 
       - name: Run backend tests
         working-directory: backend
-        run: python -m pytest -q
+        run: |
+          python -m pytest -q
 
   frontend:
     name: Frontend CI
@@ -89,8 +93,10 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: frontend
-        run: npm ci
+        run: |
+          npm ci
 
       - name: Build frontend
         working-directory: frontend
-        run: npm run build
+        run: |
+          npm run build
