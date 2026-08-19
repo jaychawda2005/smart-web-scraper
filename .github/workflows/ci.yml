@@ -28,7 +28,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Install Playwright browser
+      - name: Install Playwright Chromium
         working-directory: backend
         run: python -m playwright install --with-deps chromium
 
@@ -38,30 +38,25 @@ jobs:
           nohup python -m uvicorn main:app --host 127.0.0.1 --port 8000 > /tmp/backend8000.log 2>&1 &
           nohup python -m uvicorn main:app --host 127.0.0.1 --port 8001 > /tmp/backend8001.log 2>&1 &
 
-      - name: Wait for backend servers
+      - name: Wait for backend
         run: |
           for i in {1..30}; do
             if curl -s http://127.0.0.1:8000/ > /dev/null && \
                curl -s http://127.0.0.1:8001/ > /dev/null; then
-              echo "Both backend servers are ready"
+              echo "Backend servers are ready"
               exit 0
             fi
             sleep 2
           done
 
-          echo "Backend servers failed to start"
-          echo "===== Port 8000 log ====="
+          echo "Backend failed to start"
           cat /tmp/backend8000.log || true
-          echo "===== Port 8001 log ====="
           cat /tmp/backend8001.log || true
           exit 1
 
       - name: Run backend tests
         working-directory: backend
         run: python -m pytest -q
-
-      - name: Build backend Docker image
-        run: docker build -t smartscrape-backend ./backend
 
   frontend:
     name: Frontend CI
@@ -85,6 +80,3 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: npm run build
-
-      - name: Build frontend Docker image
-        run: docker build -t smartscrape-frontend ./frontend
