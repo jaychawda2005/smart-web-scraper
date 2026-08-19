@@ -74,7 +74,9 @@ jobs:
       - name: Run backend tests
         working-directory: backend
         run: |
-          python -m pytest -q
+          python test_api.py
+          python test_part3.py
+          python test_spa_compare.py
 
   frontend:
     name: Frontend CI
