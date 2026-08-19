@@ -1,0 +1,3 @@
+# This directory contains the SQLite database file (smart_scrape.db).
+# The database is created automatically when the backend starts.
+# It is excluded from version control via .gitignore.
