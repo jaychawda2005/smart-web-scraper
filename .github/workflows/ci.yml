@@ -32,10 +32,24 @@ jobs:
         working-directory: backend
         run: python -m playwright install --with-deps chromium
 
-      - name: Start FastAPI servers
+      - name: Prepare clean CI database
+        working-directory: backend
+        run: |
+          rm -f data/*.db data/*.db-shm data/*.db-wal
+
+            - name: Start FastAPI servers
         working-directory: backend
         run: |
           nohup python -m uvicorn main:app --host 127.0.0.1 --port 8000 > /tmp/backend8000.log 2>&1 &
+
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:8000/ > /dev/null; then
+              echo "Backend on port 8000 is ready"
+              break
+            fi
+            sleep 2
+          done
+
           nohup python -m uvicorn main:app --host 127.0.0.1 --port 8001 > /tmp/backend8001.log 2>&1 &
 
       - name: Wait for backend
