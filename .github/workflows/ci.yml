@@ -2,9 +2,11 @@ name: SmartScrape CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
 
@@ -14,7 +16,8 @@ jobs:
 
     steps:
       - name: Checkout code
-uses: actions/checkout@v5
+        uses: actions/checkout@v5
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -22,15 +25,16 @@ uses: actions/checkout@v5
 
       - name: Install backend dependencies
         working-directory: backend
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Run backend tests
         working-directory: backend
-        run: pytest -q
+        run: python -m pytest -q
 
       - name: Build backend Docker image
         run: docker build -t smartscrape-backend ./backend
-
 
   frontend:
     name: Frontend CI
@@ -38,7 +42,8 @@ uses: actions/checkout@v5
 
     steps:
       - name: Checkout code
-uses: actions/checkout@v5
+        uses: actions/checkout@v5
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
