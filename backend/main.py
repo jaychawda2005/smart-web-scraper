@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 from datetime import datetime, timezone
 from typing import Any, Optional
 
@@ -61,16 +62,27 @@ app = FastAPI(
 )
 
 # ---------------------------------------------------------------------------
-# CORS — allow the Vite/React dev server (PART 2) and common local ports
+# CORS — allow Vite/React dev server, Vercel deployments, and custom origins
 # ---------------------------------------------------------------------------
+allowed_origins = [
+    "http://localhost:5173",   # Vite default
+    "http://localhost:3000",   # Create-React-App default
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+]
+
+# Support custom frontend URLs via environment variables (e.g. ALLOWED_ORIGINS or FRONTEND_URL)
+extra_origins = os.getenv("ALLOWED_ORIGINS", "") or os.getenv("FRONTEND_URL", "")
+if extra_origins:
+    for origin in extra_origins.split(","):
+        cleaned = origin.strip()
+        if cleaned and cleaned not in allowed_origins:
+            allowed_origins.append(cleaned)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",   # Vite default
-        "http://localhost:3000",   # Create-React-App default
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
