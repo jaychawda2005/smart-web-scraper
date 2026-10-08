@@ -9,3 +9,5 @@ pydantic
 lxml
 playwright
 pytest
+pytest-cov
+httpx2
