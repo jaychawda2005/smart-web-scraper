@@ -72,7 +72,8 @@ smart-web-scraper/
 │   ├── database.py       # SQLAlchemy engine & session
 │   ├── models.py         # ScrapeJob ORM model
 │   ├── schemas.py        # Pydantic request/response schemas
-│   ├── test_api.py       # 39-test automated suite
+│   ├── tests/            # Pytest unit/integration-style backend suite
+│   ├── test_api.py       # Legacy script-based integration checks
 │   └── requirements.txt
 │
 └── frontend/
@@ -234,19 +235,11 @@ Frontend runs at: `http://localhost:5173`
 ```bash
 cd backend
 .venv\Scripts\activate
-python test_api.py
+pytest
+pytest --cov=. --cov-config=.coveragerc --cov-report=term-missing
 ```
 
-**39/39 tests pass**, covering:
-- Health check
-- Valid URL scraping (example.com, Wikipedia, httpbin)
-- All extraction options
-- Selective extraction
-- SSRF rejection (localhost, 127.0.0.1, 10.x, 192.168.x, 169.254.x)
-- Invalid/empty URL rejection
-- History API
-- All export formats (JSON, CSV, Excel)
-- History delete
+The `tests/` suite is deterministic and mocks browser/network paths so unit tests do not launch Playwright or call external websites.
 
 ---
 
